@@ -6,7 +6,7 @@ use std::{thread::JoinHandle, time::Duration};
 
 enum Message {
     /// Indicates the batcher to stop processing and exit
-    Stop,
+    Terminate,
 
     /// A sample to be processed
     Sample(Vec<ArrayD<f32>>, Sender<Vec<ArrayD<f32>>>),
@@ -20,7 +20,7 @@ pub struct Batcher {
     tx: Sender<Message>,
 
     /// Batcher's thread handle to be able to join it after stopping
-    handle: JoinHandle<()>,
+    handle: Option<JoinHandle<()>>,
 }
 
 impl Batcher {
@@ -42,7 +42,7 @@ impl Batcher {
                 while batch.has_room() {
                     if let Ok(message) = rx.recv_deadline(deadline) {
                         match message {
-                            Message::Stop => {
+                            Message::Terminate => {
                                 // abort batch
                                 return;
                             }
@@ -70,15 +70,10 @@ impl Batcher {
             }
         });
 
-        Self { tx, handle }
-    }
-
-    pub fn stop(self) {
-        // notify the batch thread to stop
-        self.tx.send(Message::Stop).unwrap();
-
-        // wait for it to stop
-        self.handle.join().unwrap();
+        Self {
+            tx,
+            handle: Some(handle),
+        }
     }
 
     pub fn run(&self, inputs: Vec<ArrayD<f32>>) -> Vec<ArrayD<f32>> {
@@ -90,5 +85,15 @@ impl Batcher {
 
         // wait for the result
         result_rx.recv().unwrap()
+    }
+}
+
+impl Drop for Batcher {
+    fn drop(&mut self) {
+        // notify the batch thread to stop
+        _ = self.tx.send(Message::Terminate);
+
+        // wait for it to stop
+        self.handle.take().unwrap().join().unwrap();
     }
 }
