@@ -1,4 +1,4 @@
-use crate::batch::Batch;
+use crate::{batch::Batch, error::*};
 use flume::{unbounded, Sender};
 use ndarray::ArrayD;
 use ort::Session;
@@ -9,7 +9,7 @@ enum Message {
     Terminate,
 
     /// A sample to be processed
-    Sample(Vec<ArrayD<f32>>, Sender<Vec<ArrayD<f32>>>),
+    Sample(Vec<ArrayD<f32>>, Sender<Result<Vec<ArrayD<f32>>>>),
 }
 
 /// A sample batcher.
@@ -42,10 +42,7 @@ impl Batcher {
                 while batch.has_room() {
                     if let Ok(message) = rx.recv_deadline(deadline) {
                         match message {
-                            Message::Terminate => {
-                                // abort batch
-                                return;
-                            }
+                            Message::Terminate => return,
                             Message::Sample(inputs, result_tx) => {
                                 batch.add_sample(inputs);
                                 batch_txs.push(result_tx);
@@ -57,14 +54,19 @@ impl Batcher {
                     }
                 }
 
-                let outputs = batch.run(&session).unwrap();
-                println!("Batch size: {}", batch_txs.len());
-
-                for (tx, outputs) in batch_txs.iter().zip(outputs.into_iter()) {
-                    tx.send(outputs).unwrap();
+                match batch.run(&session) {
+                    Ok(outputs) => {
+                        for (tx, outputs) in batch_txs.iter().zip(outputs.into_iter()) {
+                            tx.send(Ok(outputs)).unwrap();
+                        }
+                    }
+                    Err(ref error) => {
+                        for tx in &batch_txs {
+                            tx.send(Err(Error::from(error))).unwrap();
+                        }
+                    }
                 }
 
-                // Cleanup
                 batch_txs.clear();
                 batch.clear();
             }
@@ -76,15 +78,17 @@ impl Batcher {
         }
     }
 
-    pub fn run(&self, inputs: Vec<ArrayD<f32>>) -> Vec<ArrayD<f32>> {
+    pub fn run(&self, inputs: Vec<ArrayD<f32>>) -> Result<Vec<ArrayD<f32>>> {
         // create a channel to get the data back
         let (result_tx, result_rx) = unbounded();
 
         // send the input to the batch thread
-        self.tx.send(Message::Sample(inputs, result_tx)).unwrap();
+        self.tx
+            .send(Message::Sample(inputs, result_tx))
+            .map_err(|_| Error::DeadBatcher)?;
 
         // wait for the result
-        result_rx.recv().unwrap()
+        result_rx.recv().map_err(|_| Error::DeadBatcher)?
     }
 }
 
@@ -93,7 +97,7 @@ impl Drop for Batcher {
         // notify the batch thread to stop
         _ = self.tx.send(Message::Terminate);
 
-        // wait for it to stop
+        // wait for it
         self.handle.take().unwrap().join().unwrap();
     }
 }
