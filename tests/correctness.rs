@@ -18,7 +18,7 @@ fn generate_samples(session: &Session, n: usize) -> Vec<(ArrayD<f32>, ArrayD<f32
     let mut samples = Vec::new();
 
     for _ in 0..n {
-        let input = ArrayD::<f32>::random(IxDyn(&[7, 6, 4]), Uniform::new(0., 1.));
+        let input = ArrayD::<f32>::random(IxDyn(&[7, 8, 9]), Uniform::new(0., 1.));
         let input_1 = input.clone().insert_axis(Axis(0));
         let value = Value::from_array(input_1).unwrap();
         let expected_output = session.run([value]).unwrap()[0]

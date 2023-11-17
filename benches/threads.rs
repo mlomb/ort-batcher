@@ -20,7 +20,7 @@ fn load_test_model() -> ort::Result<Session> {
 #[divan::bench]
 fn sequential_without_batcher_16k() {
     let session = load_test_model().unwrap();
-    let input = ArrayD::<f32>::zeros(vec![7, 6, 4]).insert_axis(Axis(0));
+    let input = ArrayD::<f32>::zeros(vec![7, 8, 9]).insert_axis(Axis(0));
 
     for _ in 0..1024 * 16 {
         let value = black_box(Value::from_array(black_box(input.clone())).unwrap());
@@ -45,7 +45,7 @@ fn sequential_without_batcher_16k() {
 fn batch_sizes_1024t_16i_16k<const MAX_BATCH_SIZE: usize>(bencher: Bencher) {
     let session = load_test_model().unwrap();
     let batcher = Batcher::spawn(session, MAX_BATCH_SIZE, Duration::from_millis(10));
-    let inputs = vec![ArrayD::zeros(vec![7, 6, 4])];
+    let inputs = vec![ArrayD::zeros(vec![7, 8, 9])];
 
     bencher.bench(move || {
         for _ in 0..16 {
