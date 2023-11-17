@@ -40,7 +40,7 @@ fn check_batch(samples: usize, max_batch_size: usize, max_wait_time: Duration) {
     let batcher = Batcher::spawn(session, max_batch_size, max_wait_time);
 
     for (input, expected_output) in samples {
-        let output = &batcher.run(vec![input])[0];
+        let output = &batcher.run(vec![input]).unwrap()[0];
         assert!(expected_output.abs_diff_eq(output, 1e5));
     }
 }
@@ -75,7 +75,7 @@ fn chaos() {
                         &mut rng,
                         0..150,
                     )));
-                    let output = &batcher.run(vec![input])[0];
+                    let output = &batcher.run(vec![input]).unwrap()[0];
                     assert!(expected_output.abs_diff_eq(output, 1e5));
                 }
             });

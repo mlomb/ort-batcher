@@ -17,5 +17,8 @@ ndarray-rand = "0.14.0"
 ndarray = { version = "0.15.6", features = ["approx"] }
 
 [[bench]]
-name = "throughput"
+name = "threads"
 harness = false
+
+[profile.bench]
+debug = true
