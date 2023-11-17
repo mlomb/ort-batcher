@@ -24,6 +24,7 @@ pub struct Batcher {
 }
 
 impl Batcher {
+    /// Swpans a new batcher thread
     pub fn spawn(session: Session, max_batch_size: usize, max_wait_time: Duration) -> Self {
         let (tx, rx) = unbounded();
 

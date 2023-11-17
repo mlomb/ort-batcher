@@ -2,7 +2,11 @@
 name = "ort_batcher"
 version = "0.1.0"
 edition = "2021"
+description = "Small crate to batch inferences of ONNX models using ort (onnxruntime)"
 authors = ["Martín Emiliano Lombardo <hello@mlomb.dev>"]
+license = "Apache-2.0"
+repository = "https://github.com/mlomb/ort-batcher"
+keywords = ["batch", "ort", "onnxruntime"]
 
 [dependencies]
 flume = { version = "0.11.0", default-features = false }

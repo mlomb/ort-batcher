@@ -1,6 +1,10 @@
 # ort-batcher
 
-Small crate to batch inferences of ONNX models using [ort](https://github.com/pykeio/ort).
+Small crate to batch inferences of ONNX models using [ort](https://github.com/pykeio/ort). Inspired by [batched_fn](https://docs.rs/batched-fn/latest/batched_fn/).
+
+Note that it only works with models that:
+* Have their first dimension dynamic (-1), so they can be batched.
+* Inputs and outputs are tensors of type `float32`.
 
 # Usage
 
