@@ -81,6 +81,4 @@ fn chaos() {
             });
         }
     });
-
-    batcher.stop();
 }
