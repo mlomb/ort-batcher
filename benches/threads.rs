@@ -11,7 +11,7 @@ fn main() {
 fn load_test_model() -> ort::Result<Session> {
     let environment = Environment::builder().build()?.into_arc();
     let session = SessionBuilder::new(&environment)?
-        .with_intra_threads(4)?
+        .with_intra_threads(1)?
         .with_model_from_memory(include_bytes!("../tests/model.onnx"))?;
 
     Ok(session)

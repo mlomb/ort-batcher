@@ -19,6 +19,3 @@ ndarray = { version = "0.15.6", features = ["approx"] }
 [[bench]]
 name = "threads"
 harness = false
-
-[profile.bench]
-debug = true
