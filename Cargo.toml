@@ -11,11 +11,11 @@ keywords = ["batch", "ort", "onnxruntime"]
 [dependencies]
 flume = { version = "0.11.0", default-features = false }
 ndarray = { version = "0.15.6", default-features = false }
-ort = { git = "https://github.com/pykeio/ort", rev = "584a6e34", default-features = false, features = ["ndarray"] }
+ort = { version = "2.0.0-alpha.1", default-features = false, features = ["ndarray"] }
 
 [dev-dependencies]
 rand = "0.8.5"
-ort = { git = "https://github.com/pykeio/ort", rev = "584a6e34", features = ["download-binaries", "fetch-models", "cuda"] }
+ort = { version = "2.0.0-alpha.1", features = ["download-binaries", "fetch-models", "cuda"] }
 divan = "0.1.2"
 ndarray-rand = "0.14.0"
 ndarray = { version = "0.15.6", features = ["approx"] }

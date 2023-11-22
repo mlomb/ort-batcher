@@ -1,6 +1,6 @@
 use divan::{black_box, Bencher};
 use ndarray::{ArrayD, Axis};
-use ort::{Environment, Session, SessionBuilder, Value};
+use ort::{Session, Value};
 use ort_batcher::batcher::Batcher;
 use std::time::Duration;
 
@@ -9,8 +9,7 @@ fn main() {
 }
 
 fn load_test_model() -> ort::Result<Session> {
-    let environment = Environment::builder().build()?.into_arc();
-    let session = SessionBuilder::new(&environment)?
+    let session = Session::builder()?
         .with_intra_threads(1)?
         .with_model_from_memory(include_bytes!("../tests/model.onnx"))?;
 

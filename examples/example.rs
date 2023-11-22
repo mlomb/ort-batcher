@@ -1,16 +1,16 @@
 use ndarray::{ArrayD, Axis};
-use ort::{CUDAExecutionProvider, Environment, SessionBuilder, Value};
+use ort::{CUDAExecutionProvider, Session, Value};
 use ort_batcher::batcher::Batcher;
 use std::time::Duration;
 
 fn main() -> ort::Result<()> {
     tracing_subscriber::fmt::init();
 
-    let environment = Environment::builder()
+    ort::init()
         .with_execution_providers([CUDAExecutionProvider::default().build()])
-        .build()?
-        .into_arc();
-    let session = SessionBuilder::new(&environment)?
+        .commit()?;
+
+    let session = Session::builder()?
         .with_intra_threads(1)?
         .with_model_from_memory(include_bytes!("../tests/model.onnx"))?;
 
