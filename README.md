@@ -1,5 +1,10 @@
 # ort-batcher
 
+<a href="https://crates.io/crates/ort_batcher" target="_blank">
+    <img alt="Crates.io" src="https://img.shields.io/crates/v/ort_batcher?style=for-the-badge&logo=rust">
+</a>
+
+
 Small crate to batch inferences of ONNX models using [ort](https://github.com/pykeio/ort). Inspired by [batched_fn](https://docs.rs/batched-fn/latest/batched_fn/).
 
 Note that it only works with models that:
