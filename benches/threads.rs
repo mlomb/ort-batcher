@@ -39,11 +39,11 @@ fn sequential_without_batcher_16k() {
     // number of producers
     threads = [1024],
     // batch size
-    consts = [1, 32, 64, 128, 256, 512, 1024]
+    args = [1, 32, 64, 128, 256, 512, 1024]
 )]
-fn batch_sizes_1024t_16i_16k<const MAX_BATCH_SIZE: usize>(bencher: Bencher) {
+fn batch_sizes_1024t_16i_16k(bencher: Bencher, max_batch_size: usize) {
     let session = load_test_model().unwrap();
-    let batcher = Batcher::spawn(session, MAX_BATCH_SIZE, Duration::from_millis(10));
+    let batcher = Batcher::spawn(session, max_batch_size, Duration::from_millis(10));
     let inputs = vec![ArrayD::zeros(vec![7, 8, 9])];
 
     bencher.bench(move || {
