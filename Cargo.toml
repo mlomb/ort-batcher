@@ -17,7 +17,7 @@ ort = { version = "2.0.0-alpha.1", default-features = false, features = ["ndarra
 [dev-dependencies]
 rand = "0.8.5"
 ort = { version = "2.0.0-alpha.1", features = ["download-binaries", "fetch-models", "cuda"] }
-divan = "0.1.2"
+divan = "0.1.11"
 ndarray-rand = "0.14.0"
 ndarray = { version = "0.15.6", features = ["approx"] }
 tracing-subscriber = "0.3.18"
